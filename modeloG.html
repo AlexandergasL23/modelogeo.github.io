@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Modelado Geométrico: Primitivas, Transformaciones y Superficies</title>
+    <title>Modelado Geométrico 3D | Primitivas + NURBS + Fractales</title>
     <style>
         body {
             margin: 0;
             overflow: hidden;
             font-family: 'Segoe UI', 'Poppins', 'Montserrat', sans-serif;
         }
-        
+
         /* Panel de información elegante */
         .info-panel {
             position: absolute;
@@ -27,24 +27,24 @@
             box-shadow: 0 4px 20px rgba(0,0,0,0.3);
             font-weight: 500;
         }
-        
+
         .info-panel h1 {
             margin: 0;
             font-size: 1.4rem;
             letter-spacing: 1px;
         }
-        
+
         .info-panel h1 span {
             color: #ffb347;
             font-weight: bold;
         }
-        
+
         .info-panel p {
             margin: 5px 0 0;
             font-size: 0.8rem;
             opacity: 0.9;
         }
-        
+
         .controls-hint {
             position: absolute;
             bottom: 20px;
@@ -59,7 +59,7 @@
             z-index: 10;
             pointer-events: none;
         }
-        
+
         /* Botón de toggle para explicación técnica */
         .tech-btn {
             position: absolute;
@@ -80,12 +80,12 @@
             letter-spacing: 0.5px;
             border: 1px solid rgba(255,255,255,0.2);
         }
-        
+
         .tech-btn:hover {
             background: #ff7e5e;
             transform: scale(1.02);
         }
-        
+
         .explanation {
             position: absolute;
             bottom: 80px;
@@ -104,24 +104,24 @@
             pointer-events: none;
             box-shadow: 0 5px 20px rgba(0,0,0,0.5);
         }
-        
+
         .explanation h3 {
             margin: 0 0 8px 0;
             color: #ffb347;
             font-size: 1rem;
         }
-        
+
         .explanation p {
             margin: 5px 0;
             line-height: 1.4;
         }
-        
+
         .explanation.hidden {
             opacity: 0;
             visibility: hidden;
             transform: translateY(20px);
         }
-        
+
         @media (max-width: 600px) {
             .info-panel { top: 10px; left: 10px; padding: 6px 12px; }
             .info-panel h1 { font-size: 1rem; }
@@ -148,7 +148,6 @@
         <p style="margin-top:6px;"><em>El modelado geométrico permite describir formas complejas mediante primitivas, curvas paramétricas y sistemas recursivos.</em></p>
     </div>
 
-    <!-- Importamos Three.js y librerías adicionales -->
     <script type="importmap">
         {
             "imports": {
@@ -166,21 +165,19 @@
         // --- Setup de escena, cámara, renderers ---
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0x050b1a);
-        scene.fog = new THREE.FogExp2(0x050b1a, 0.008); // niebla sutil
-        
-        // Cámara perspectiva
+        scene.fog = new THREE.FogExp2(0x050b1a, 0.008);
+
         const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
         camera.position.set(5, 4, 8);
         camera.lookAt(0, 0, 0);
-        
+
         const renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.shadowMap.enabled = true; // sombras para realismo
+        renderer.shadowMap.enabled = true;
         renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         renderer.setPixelRatio(window.devicePixelRatio);
         document.body.appendChild(renderer.domElement);
-        
-        // CSS2DRenderer para etiquetas simples
+
         const labelRenderer = new CSS2DRenderer();
         labelRenderer.setSize(window.innerWidth, window.innerHeight);
         labelRenderer.domElement.style.position = 'absolute';
@@ -188,8 +185,7 @@
         labelRenderer.domElement.style.left = '0px';
         labelRenderer.domElement.style.pointerEvents = 'none';
         document.body.appendChild(labelRenderer.domElement);
-        
-        // --- Controles interactivos ---
+
         const controls = new OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
         controls.dampingFactor = 0.05;
@@ -197,14 +193,11 @@
         controls.zoomSpeed = 1.2;
         controls.enableZoom = true;
         controls.enablePan = true;
-        controls.panSpeed = 0.8;
-        
-        // --- Iluminación: clave para resaltar geometría ---
-        // Luz ambiental
+
+        // --- Iluminación ---
         const ambientLight = new THREE.AmbientLight(0x404060);
         scene.add(ambientLight);
-        
-        // Luz principal direccional (sombra)
+
         const mainLight = new THREE.DirectionalLight(0xfff5e6, 1.2);
         mainLight.position.set(3, 5, 2);
         mainLight.castShadow = true;
@@ -218,23 +211,20 @@
         mainLight.shadow.camera.top = 5;
         mainLight.shadow.camera.bottom = -5;
         scene.add(mainLight);
-        
-        // Luz de relleno cálida desde atrás
+
         const backLight = new THREE.PointLight(0xffaa66, 0.5);
         backLight.position.set(-2, 1, -3);
         scene.add(backLight);
-        
-        // Luz fría desde abajo para dramatismo
+
         const fillLight = new THREE.PointLight(0x6688ff, 0.4);
         fillLight.position.set(1, -2, 1);
         scene.add(fillLight);
-        
-        // Luz puntual móvil que rota (efecto dinámico)
+
         const movingLight = new THREE.PointLight(0xff8866, 0.7);
         movingLight.position.set(2, 3, 2);
         scene.add(movingLight);
-        
-        // Pequeño efecto de partículas estrellas para ambientación
+
+        // Estrellas de fondo
         const starGeometry = new THREE.BufferGeometry();
         const starCount = 1200;
         const starPositions = new Float32Array(starCount * 3);
@@ -247,8 +237,8 @@
         const starMaterial = new THREE.PointsMaterial({ color: 0xffffff, size: 0.08, transparent: true, opacity: 0.6 });
         const stars = new THREE.Points(starGeometry, starMaterial);
         scene.add(stars);
-        
-        // --- Suelo reflectivo sutil (sombra) ---
+
+        // Suelo para sombras
         const groundPlane = new THREE.Mesh(
             new THREE.PlaneGeometry(12, 12),
             new THREE.ShadowMaterial({ opacity: 0.4, color: 0x000000, transparent: true, side: THREE.DoubleSide })
@@ -257,8 +247,8 @@
         groundPlane.position.y = -1.6;
         groundPlane.receiveShadow = true;
         scene.add(groundPlane);
-        
-        // --- 1. PRIMITIVA: Esfera metálica pulida (modelado geométrico clásico) ---
+
+        // --- 1. Esfera ---
         const sphereGeo = new THREE.SphereGeometry(0.85, 64, 64);
         const sphereMat = new THREE.MeshStandardMaterial({ 
             color: 0x3a86ff, 
@@ -272,8 +262,7 @@
         sphere.receiveShadow = true;
         sphere.position.set(-1.8, -0.2, 1.2);
         scene.add(sphere);
-        
-        // etiqueta CSS2D
+
         const sphereLabelDiv = document.createElement('div');
         sphereLabelDiv.textContent = '🔵 Esfera (Primitiva)';
         sphereLabelDiv.style.color = '#aaccff';
@@ -288,8 +277,8 @@
         sphereLabel.position.copy(sphere.position);
         sphereLabel.position.y += 1.1;
         scene.add(sphereLabel);
-        
-        // --- 2. PRIMITIVA: Toro (anillo) con efecto de brillo ---
+
+        // --- 2. Toro ---
         const torusGeo = new THREE.TorusGeometry(0.9, 0.28, 64, 128);
         const torusMat = new THREE.MeshStandardMaterial({ color: 0xef476f, metalness: 0.7, roughness: 0.3, emissive: 0x330011 });
         const torus = new THREE.Mesh(torusGeo, torusMat);
@@ -298,7 +287,7 @@
         torus.rotation.x = Math.PI / 2;
         torus.rotation.z = 0.5;
         scene.add(torus);
-        
+
         const torusLabelDiv = document.createElement('div');
         torusLabelDiv.textContent = '🔘 Toro (Superficie de revolución)';
         torusLabelDiv.style.cssText = sphereLabelDiv.style.cssText;
@@ -307,15 +296,15 @@
         torusLabel.position.copy(torus.position);
         torusLabel.position.y += 1.2;
         scene.add(torusLabel);
-        
-        // --- 3. Cilindro con transformación: rotación dinámica ---
+
+        // --- 3. Cilindro ---
         const cylinderGeo = new THREE.CylinderGeometry(0.65, 0.65, 1.2, 48);
         const cylinderMat = new THREE.MeshStandardMaterial({ color: 0x06d6a0, metalness: 0.6, roughness: 0.4 });
         const cylinder = new THREE.Mesh(cylinderGeo, cylinderMat);
         cylinder.castShadow = true;
         cylinder.position.set(-1.2, -0.5, -1.7);
         scene.add(cylinder);
-        
+
         const cylLabelDiv = document.createElement('div');
         cylLabelDiv.textContent = '🧪 Cilindro (Primitiva Extruída)';
         cylLabelDiv.style.cssText = sphereLabelDiv.style.cssText;
@@ -324,35 +313,28 @@
         cylLabel.position.copy(cylinder.position);
         cylLabel.position.y += 0.9;
         scene.add(cylLabel);
-        
-        // --- 4. SUPERFICIE NURBS / paramétrica con geometría personalizada (superficie de onda) ---
-        // Creamos una superficie elegante similar a NURBS pero con matemática paramétrica explicita
-        // Demostrando curvas paramétricas -> geometría libre
+
+        // --- 4. Superficie Paramétrica (NURBS-like) ---
         const widthSegments = 60;
         const heightSegments = 60;
         const surfaceWidth = 2.4;
         const surfaceHeight = 2.4;
-        
+
         const vertices = [];
         const indices = [];
         const normals = [];
-        
-        // Función de altura tipo "silla de montar + ondas" para representar modelado geométrico libre
+
         for (let i = 0; i <= widthSegments; i++) {
-            const u = i / widthSegments; // 0..1
+            const u = i / widthSegments;
             const x = (u - 0.5) * surfaceWidth;
             for (let j = 0; j <= heightSegments; j++) {
                 const v = j / heightSegments;
                 const z = (v - 0.5) * surfaceHeight;
-                // Modelado matemático: combinación de senos y cosenos, demostrando superficies paramétricas
                 const y = 0.6 * Math.sin(x * 1.8) * Math.cos(z * 1.8) 
                         + 0.25 * Math.sin(x * 3.5 + 1.2) * 0.8 
                         + 0.2 * Math.cos(z * 2.3);
                 vertices.push(x, y, z);
                 
-                // calcular normales aproximadas (diferencias finitas)
-                let nx = 0, ny = 1, nz = 0;
-                // simplificado pero visualmente correcto para reflejos
                 const eps = 0.05;
                 const y1 = 0.6 * Math.sin((x+eps) * 1.8) * Math.cos(z * 1.8) + 0.25 * Math.sin((x+eps) * 3.5 + 1.2) + 0.2 * Math.cos(z * 2.3);
                 const y2 = 0.6 * Math.sin((x-eps) * 1.8) * Math.cos(z * 1.8) + 0.25 * Math.sin((x-eps) * 3.5 + 1.2) + 0.2 * Math.cos(z * 2.3);
@@ -364,32 +346,30 @@
                 normals.push(norm.x, norm.y, norm.z);
             }
         }
-        
-        // Generar índices (triángulos)
+
         for (let i = 0; i < widthSegments; i++) {
             for (let j = 0; j < heightSegments; j++) {
                 const a = i * (heightSegments + 1) + j;
                 const b = i * (heightSegments + 1) + j + 1;
                 const c = (i + 1) * (heightSegments + 1) + j;
                 const d = (i + 1) * (heightSegments + 1) + j + 1;
-                
                 indices.push(a, b, c);
                 indices.push(b, d, c);
             }
         }
-        
+
         const surfaceGeo = new THREE.BufferGeometry();
         surfaceGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(vertices), 3));
         surfaceGeo.setAttribute('normal', new THREE.BufferAttribute(new Float32Array(normals), 3));
         surfaceGeo.setIndex(indices);
-        
-        const surfaceMat = new THREE.MeshStandardMaterial({ color: 0xca6eff, metalness: 0.75, roughness: 0.25, emissive: 0x331166, flatShading: false });
+
+        const surfaceMat = new THREE.MeshStandardMaterial({ color: 0xca6eff, metalness: 0.75, roughness: 0.25, emissive: 0x331166 });
         const parametricSurface = new THREE.Mesh(surfaceGeo, surfaceMat);
         parametricSurface.castShadow = true;
         parametricSurface.receiveShadow = true;
         parametricSurface.position.set(2.2, -0.4, -1.8);
         scene.add(parametricSurface);
-        
+
         const nurbsLabelDiv = document.createElement('div');
         nurbsLabelDiv.textContent = '🌀 Superficie Paramétrica (NURBS-like)';
         nurbsLabelDiv.style.cssText = sphereLabelDiv.style.cssText;
@@ -399,17 +379,15 @@
         nurbsLabel.position.copy(parametricSurface.position);
         nurbsLabel.position.y += 1.25;
         scene.add(nurbsLabel);
-        
-        // --- 5. FRACTAL: Tetraedro de Sierpinski (sistema recursivo, geometría fractal) ---
-        // Grupo contenedor del fractal
+
+        // --- 5. Fractal de Sierpinski 3D ---
         const fractalGroup = new THREE.Group();
         fractalGroup.position.set(-1.5, -0.7, -1.9);
         scene.add(fractalGroup);
-        
+
         function createTetrahedron(size, color, posX, posY, posZ) {
-            // Tetraedro regular con 4 vértices
             const height = Math.sqrt(2/3) * size;
-            const vertices = [
+            const verticesTet = [
                 new THREE.Vector3(0, height/2, 0),
                 new THREE.Vector3(size/2, -height/2, size/3),
                 new THREE.Vector3(-size/2, -height/2, size/3),
@@ -417,12 +395,11 @@
             ];
             const geometry = new THREE.BufferGeometry();
             const positions = [];
-            // caras (4 triángulos)
             const faces = [[0,1,2], [0,2,3], [0,3,1], [1,2,3]];
             faces.forEach(face => {
-                const v0 = vertices[face[0]];
-                const v1 = vertices[face[1]];
-                const v2 = vertices[face[2]];
+                const v0 = verticesTet[face[0]];
+                const v1 = verticesTet[face[1]];
+                const v2 = verticesTet[face[2]];
                 positions.push(v0.x, v0.y, v0.z);
                 positions.push(v1.x, v1.y, v1.z);
                 positions.push(v2.x, v2.y, v2.z);
@@ -433,51 +410,21 @@
             const mesh = new THREE.Mesh(geometry, material);
             mesh.position.set(posX, posY, posZ);
             mesh.castShadow = true;
-            mesh.receiveShadow = false;
             return mesh;
         }
+
+        fractalGroup.add(createTetrahedron(1.2, 0xffaa55, 0, 0, 0));
         
-        // Construcción recursiva limitada a nivel 2 para rendimiento pero visualmente impactante
-        // Nivel 0: tetraedro grande base
-        const baseColor = 0xffaa55;
-        const lvl0 = createTetrahedron(1.2, baseColor, 0, 0, 0);
-        fractalGroup.add(lvl0);
-        
-        // Nivel 1: 4 tetraedros más pequeños en cada vértice
-        const childSize = 0.62;
-        const offsetY = 0.45;
-        const childColor = 0xff8c42;
-        const positionsLvl1 = [
-            [0, 0.72, 0],        // superior
-            [0.65, -0.28, 0.45], // frente-derecha
-            [-0.65, -0.28, 0.45],// frente-izq
-            [0, -0.28, -0.82]    // trasero
-        ];
+        const positionsLvl1 = [[0, 0.72, 0], [0.65, -0.28, 0.45], [-0.65, -0.28, 0.45], [0, -0.28, -0.82]];
         positionsLvl1.forEach(pos => {
-            const child = createTetrahedron(childSize, childColor, pos[0], pos[1], pos[2]);
-            fractalGroup.add(child);
+            fractalGroup.add(createTetrahedron(0.62, 0xff8c42, pos[0], pos[1], pos[2]));
         });
-        
-        // Nivel 2: aún más pequeños para detalle fractal (12 piezas)
-        const tinySize = 0.34;
-        const tinyColor = 0xffb347;
-        const offsets = [
-            [[0, 1.0, 0], [0.4, -0.05, 0.28], [-0.4, -0.05, 0.28], [0, -0.05, -0.58]],
-            [[0.85, 0.2, 0.58], [1.18, -0.15, 0.8], [0.6, -0.15, 1.0], [0.82, -0.2, 0.2]],
-            [[-0.85, 0.2, 0.58], [-1.18, -0.15, 0.8], [-0.6, -0.15, 1.0], [-0.82, -0.2, 0.2]],
-            [[0, 0.2, -1.08], [0.52, -0.18, -1.3], [-0.52, -0.18, -1.3], [0, -0.25, -1.6]]
-        ];
-        // aplicamos sobre cada posición del nivel1 usando grupo fractal
-        // simplificación: añadir 8 tetraedros extra para dar sensación fractal sin sobrecargar
+
         for (let i = 0; i < 8; i++) {
             const angle = (i / 8) * Math.PI * 2;
-            const rad = 0.9;
-            const xOff = Math.cos(angle) * rad;
-            const zOff = Math.sin(angle) * rad;
-            const tinyTet = createTetrahedron(tinySize, tinyColor, xOff, -0.35, zOff);
-            fractalGroup.add(tinyTet);
+            fractalGroup.add(createTetrahedron(0.34, 0xffb347, Math.cos(angle) * 0.9, -0.35, Math.sin(angle) * 0.9));
         }
-        
+
         const fractalLabelDiv = document.createElement('div');
         fractalLabelDiv.textContent = '🔺 Fractal de Sierpinski 3D (Geometría recursiva)';
         fractalLabelDiv.style.cssText = sphereLabelDiv.style.cssText;
@@ -487,62 +434,52 @@
         fractalLabel.position.copy(fractalGroup.position);
         fractalLabel.position.y += 1.2;
         scene.add(fractalLabel);
-        
-        // Añadir un eje de referencia decorativo (opcional, pequeño)
+
+        // Ejes de referencia sutiles
         const axesHelper = new THREE.AxesHelper(3);
         axesHelper.material.transparent = true;
         axesHelper.material.opacity = 0.12;
         scene.add(axesHelper);
-        
-        // --- Animación dinámica: rotación de elementos, luz móvil y transformaciones ---
+
+        // --- Animación ---
         let time = 0;
-        
+
         function animate() {
             requestAnimationFrame(animate);
             time += 0.012;
             
-            // Rotación del toro para mostrar transformación continua
             torus.rotation.z = Math.sin(time * 0.7) * 0.5;
             torus.rotation.x = Math.PI / 2 + Math.sin(time * 0.5) * 0.2;
             
-            // Esfera con leve oscilación de escala (modelado por transformaciones)
             const scale = 1 + Math.sin(time * 1.2) * 0.03;
             sphere.scale.set(scale, scale, scale);
             
-            // Cilindro rotación y traslación orbital pequeña
             cylinder.rotation.y = time * 0.5;
             cylinder.position.x = -1.2 + Math.sin(time * 0.4) * 0.08;
             
-            // Superficie paramétrica: modificar ligeramente vertices? mejor no por rendimiento, pero movemos luz
             movingLight.position.x = 2.5 + Math.sin(time) * 1.2;
             movingLight.position.z = 1.8 + Math.cos(time * 0.9) * 1.5;
             
-            // Hacer rotar suavemente el fractal completo para mostrar sus facetas
             fractalGroup.rotation.y = time * 0.15;
             fractalGroup.rotation.x = Math.sin(time * 0.2) * 0.1;
             
-            // Estrellas rotación lenta
             stars.rotation.y += 0.0005;
             stars.rotation.x += 0.0003;
             
-            // Actualizar controles
-            controls.update(); // si hay damping
-            
-            // Renderizado
+            controls.update();
             renderer.render(scene, camera);
             labelRenderer.render(scene, camera);
         }
-        
+
         animate();
-        
-        // --- Ventana explicativa toggle ---
+
+        // Toggle para explicación
         const toggleBtn = document.getElementById('toggleTech');
         const explanationDiv = document.getElementById('explanationBox');
         toggleBtn.addEventListener('click', () => {
             explanationDiv.classList.toggle('hidden');
         });
-        
-        // Ajuste responsive
+
         window.addEventListener('resize', onWindowResize, false);
         function onWindowResize() {
             camera.aspect = window.innerWidth / window.innerHeight;
@@ -550,9 +487,8 @@
             renderer.setSize(window.innerWidth, window.innerHeight);
             labelRenderer.setSize(window.innerWidth, window.innerHeight);
         }
-        
-        // Pequeño mensaje en consola
-        console.log('✨ Modelado Geométrico Avanzado: Primitivas, NURBS paramétrico y Fractales en 3D');
+
+        console.log('✨ Modelado Geométrico Avanzado - Demo interactiva para GitHub Pages');
     </script>
 </body>
 </html>
