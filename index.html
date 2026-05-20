@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>✨ VIVORIM | El Templo de los Verbos y las Luces Giratorias ✨</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            min-height: 100vh;
+            background: radial-gradient(circle at 20% 30%, #0a0f1a, #010101);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Inter', 'Poppins', 'Segoe UI', system-ui, sans-serif;
+            padding: 20px;
+            position: relative;
+        }
+
+        /* PAPIRO FINAL (estilo antiguo) */
+        .papiro-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.92);
+            backdrop-filter: blur(14px);
+            z-index: 3000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            visibility: hidden;
+            opacity: 0;
+            transition: all 0.4s ease;
+        }
+        .papiro-overlay.active {
+            visibility: visible;
+            opacity: 1;
+        }
+        .papiro-card {
+            background: #FDF2DA;
+            background-image: repeating-linear-gradient(45deg, rgba(200,170,110,0.1) 0px, rgba(200,170,110,0.1) 2px, transparent 2px, transparent 8px);
+            border-radius: 48px 48px 64px 64px;
+            max-width: 650px;
+            width: 90%;
+            padding: 36px 32px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.6), inset 0 0 30px rgba(255,215,0,0.3);
+            border: 1px solid #e9c891;
+            font-family: 'Courier New', 'Times New Roman', monospace;
+            color: #2c2416;
+            position: relative;
+        }
+        .papiro-card h2 {
+            font-size: 2rem;
+            text-align: center;
+            border-bottom: 2px dashed #c2a15b;
+            display: inline-block;
+            width: 100%;
+            margin-bottom: 25px;
+            letter-spacing: 3px;
+            font-weight: bold;
+            color: #6b4c2c;
+        }
+        .papiro-stats {
+            margin: 25px 0;
+            max-height: 380px;
+            overflow-y: auto;
+            padding-right: 8px;
+        }
+        .jugador-resumen {
+            background: rgba(200, 170, 100, 0.2);
+            margin: 15px 0;
+            padding: 14px 18px;
+            border-radius: 28px;
+            border-left: 6px solid #d6a145;
+        }
+        .aciertos { color: #2a6b2f; font-weight: bold; }
+        .fallos { color: #b13e3e; font-weight: bold; }
+        .papiro-footer {
+            text-align: center;
+            margin-top: 20px;
+            font-style: italic;
+            border-top: 1px dashed #c2a15b;
+            padding-top: 18px;
+        }
+        .close-papiro {
+            background: #7d5d3a;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 50px;
+            color: #fef0cf;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 12px;
+            font-family: monospace;
+        }
+
+        .game-container {
+            max-width: 1500px;
+            width: 100%;
+            background: rgba(15, 25, 40, 0.7);
+            backdrop-filter: blur(12px);
+            border-radius: 60px;
+            padding: 28px;
+            box-shadow: 0 30px 50px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 215, 120, 0.25);
+        }
+
+        /* TÍTULO CON LUCES GIRATORIAS */
+        .vivo-title {
+            text-align: center;
+            margin-bottom: 18px;
+            position: relative;
+        }
+        .glow-name {
+            font-size: 3.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #FFE6B0, #FFB347, #FF6A4B);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 12px #ffa047;
+            display: inline-block;
+            letter-spacing: 5px;
+            position: relative;
+            z-index: 3;
+        }
+        .rotating-lights {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 110%;
+            height: 130%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 1;
+        }
+        .light-beam {
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #ffdd77, #ffaa33);
+            box-shadow: 0 0 18px 4px #ffcc44;
+            animation: orbit 4s linear infinite;
+        }
+        @keyframes orbit {
+            0% { transform: rotate(0deg) translateX(150px) rotate(0deg); opacity: 0.9; }
+            100% { transform: rotate(360deg) translateX(150px) rotate(-360deg); opacity: 0.9; }
+        }
+        .light-beam:nth-child(1) { animation-duration: 4.2s; background: #ffb347; }
+        .light-beam:nth-child(2) { animation-duration: 3.6s; animation-delay: -1s; background: #ffd966; width: 22px; height: 22px; }
+        .light-beam:nth-child(3) { animation-duration: 5s; animation-delay: -2.2s; background: #ff884d; box-shadow: 0 0 25px gold; }
+        .light-beam:nth-child(4) { animation-duration: 3.2s; animation-delay: -0.5s; background: #ffb56b; width: 14px; height: 14px; }
+        .light-beam:nth-child(5) { animation-duration: 4.8s; animation-delay: -3s; background: #ffd07a; }
+        .light-beam:nth-child(6) { animation-duration: 3.9s; animation-delay: -1.8s; width: 20px; background: #f5bc70; }
+
+        /* SELECCION */
+        .selection-screen {
+            background: rgba(10, 20, 30, 0.94);
+            backdrop-filter: blur(16px);
+            border-radius: 60px;
+            padding: 36px 28px;
+            text-align: center;
+            color: #fef3c7;
+            border: 1px solid rgba(255, 200, 100, 0.4);
+        }
+        .players-options {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            flex-wrap: wrap;
+            margin: 30px 0 20px;
+        }
+        .player-btn {
+            background: linear-gradient(135deg, #2a3a48, #1a2532);
+            border: none;
+            font-size: 1.4rem;
+            font-weight: bold;
+            padding: 14px 32px;
+            border-radius: 80px;
+            cursor: pointer;
+            transition: 0.2s;
+            color: #FFE2B5;
+            font-family: inherit;
+            box-shadow: 0 6px 14px rgba(0,0,0,0.3);
+        }
+        .player-btn:hover {
+            background: linear-gradient(135deg, #F9A26C, #E68342);
+            transform: translateY(-3px);
+        }
+        .rules-collapsible {
+            background: rgba(0, 0, 0, 0.55);
+            border-radius: 36px;
+            margin: 25px auto;
+            max-width: 620px;
+            overflow: hidden;
+        }
+        .rules-header {
+            display: flex;
+            justify-content: space-between;
+            padding: 18px 28px;
+            cursor: pointer;
+            background: rgba(0,0,0,0.5);
+        }
+        .rules-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.45s;
+            background: rgba(0,0,0,0.35);
+            padding: 0 28px;
+        }
+        .rules-content.open { max-height: 400px; padding: 20px 28px; }
+        .toggle-icon.rotated { transform: rotate(180deg); display: inline-block;}
+
+        /* TABLERO */
+        .game-layout {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 28px;
+            justify-content: center;
+        }
+        .board-section {
+            flex: 3;
+            min-width: 680px;
+            background: rgba(20, 30, 42, 0.75);
+            border-radius: 52px;
+            padding: 24px;
+        }
+        .snakes-ladders-board {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            background: #0a111c;
+            border-radius: 36px;
+            padding: 16px;
+            gap: 10px;
+        }
+        .cell {
+            aspect-ratio: 1/1;
+            background: linear-gradient(145deg, #1a2538, #111b28);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            border: 1px solid #3a5068;
+            font-weight: bold;
+            cursor: default;
+        }
+        .cell-number { font-size: 1.35rem; font-weight: 700; color: #eef4ff; z-index: 2; }
+        .cell.snake { border: 2px solid #ff6b4a; box-shadow: 0 0 8px #ff6b4a; }
+        .cell.ladder { border: 2px solid #4aff9e; box-shadow: 0 0 8px #4aff9e; }
+        .cell.crown-cell { border: 3px solid #FFD700; box-shadow: 0 0 18px #FFD700; }
+        .cell.occupied { box-shadow: 0 0 0 3px #FFD966, 0 0 24px #ffaa33; }
+        .players-on-cell {
+            position: absolute;
+            bottom: 5px;
+            display: flex;
+            gap: 4px;
+            justify-content: center;
+            left: 0; right: 0;
+        }
+        .token {
+            width: 26px; height: 26px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: bold; background: gold; box-shadow: 0 0 0 2px white;
+            font-size: 0.75rem;
+        }
+        .info-panel {
+            flex: 1;
+            min-width: 290px;
+            background: rgba(22, 30, 42, 0.88);
+            border-radius: 52px;
+            padding: 28px;
+        }
+        .dice {
+            width: 105px; height: 105px; background: radial-gradient(#f5f5f5, #d4d4d4);
+            margin: 0 auto; border-radius: 28px; display: flex; align-items: center; justify-content: center;
+            font-size: 3.8rem; cursor: pointer; box-shadow: 0 10px 0 #886633;
+        }
+        .roll-btn { background: linear-gradient(95deg, #F9A26C, #E68342); width: 100%; padding: 14px; border-radius: 60px; font-weight: bold; margin-top: 18px; cursor: pointer; border: none; }
+        .modal-overlay {
+            position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.95); backdrop-filter: blur(24px);
+            display: flex; align-items: center; justify-content: center; z-index: 1000; visibility: hidden; opacity: 0;
+            transition: 0.2s;
+        }
+        .modal-overlay.active { visibility: visible; opacity: 1; }
+        .question-card { background: #1e2b3c; border-radius: 64px; padding: 38px; max-width: 480px; text-align: center; border: 2px solid #F9A26C; }
+        .opt-btn { background: #2c3e52; color: #FFE2B5; padding: 12px; margin: 8px; border-radius: 60px; border: none; cursor: pointer; width: 80%; }
+        .fullscreen-alert { 
+            position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.94); backdrop-filter: blur(28px); 
+            display: flex; align-items: center; justify-content: center; z-index: 2000; 
+            animation: fadeAlert 2.3s forwards; pointer-events: none;
+        }
+        @keyframes fadeAlert { 0%{opacity:0;} 15%{opacity:1;} 85%{opacity:1;} 100%{opacity:0; visibility:hidden;} }
+        .dice-spin-alert { position: fixed; top:45%; left:50%; transform:translate(-50%,-50%); background:#000000cc; backdrop-filter:blur(20px); color:#FFD966; padding: 15px 34px; border-radius:70px; z-index:1500; animation:fadeAlert 0.95s forwards; white-space: nowrap; }
+        .dice-spinning { animation: spinDiceCenter 0.65s cubic-bezier(0.4,0,0.2,1) forwards; }
+        @keyframes spinDiceCenter { 0%{transform:rotate(0deg)} 100%{transform:rotate(720deg)} }
+        .turn-indicator { background: #1f2b35; padding: 8px 22px; border-radius: 40px; display: inline-block; margin-bottom: 12px; }
+    </style>
+</head>
+<body>
+
+<div id="selectionContainer" class="selection-screen">
+    <div class="vivo-title">
+        <div class="rotating-lights">
+            <div class="light-beam" style="top: 20%; left: 15%;"></div>
+            <div class="light-beam" style="top: 70%; left: 80%;"></div>
+            <div class="light-beam" style="top: 10%; left: 85%;"></div>
+            <div class="light-beam" style="top: 85%; left: 20%;"></div>
+            <div class="light-beam" style="top: 45%; left: 5%;"></div>
+            <div class="light-beam" style="top: 60%; left: 95%;"></div>
+        </div>
+        <span class="glow-name">⚡ VIVORIM ⚡</span>
+    </div>
+    <h2 style="font-size:1.2rem;">✨ VERBOS INFINITOS · TABLERO MÁGICO ✨</h2>
+    <div class="rules-collapsible">
+        <div class="rules-header" id="rulesHeader">
+            <span>📜 REGLAS SAGRADAS</span>
+            <span class="toggle-icon" id="toggleIcon">▼</span>
+        </div>
+        <div class="rules-content" id="rulesContent">
+            <ul><li>🎲 Tira el dado → girará y te retará con un verbo + emoji.</li><li>✅ Aciertas: AVANZAS el número del dado (y además sumas +1 verbo dominado).</li><li>❌ Fallas: No avanzas y el turno pasa.</li><li>🐍 Serpientes rojas: castigo que baja (y pueden encadenarse).</li><li>🪜 Resortes verdes: ¡te elevan! (también encadenados).</li><li>👑 Primero en llegar a la casilla 50 GANA.</li><li>Al final del juego, un PAPIRO mostrará tus aciertos, fallos y verbos dominados.</li></ul>
+        </div>
+    </div>
+    <p>🌀 SELECCIONA GUERREROS VERBALES:</p>
+    <div class="players-options"><button class="player-btn" data-players="1">1</button><button class="player-btn" data-players="2">2</button><button class="player-btn" data-players="3">3</button><button class="player-btn" data-players="4">4</button></div>
+</div>
+
+<div id="gameContainer" style="display: none;">
+    <div class="game-container">
+        <div class="vivo-title" style="margin-top: -8px;">
+            <div class="rotating-lights"><div class="light-beam"></div><div class="light-beam"></div><div class="light-beam"></div><div class="light-beam"></div><div class="light-beam"></div><div class="light-beam"></div></div>
+            <span class="glow-name" style="font-size: 2.2rem;">🔥 VIVORIM · ENCOUNTER 🔥</span>
+        </div>
+        <div class="game-layout">
+            <div class="board-section"><div class="board-header"><div class="turn-indicator" id="turnText">🎲 TURNO: JUGADOR 1</div></div>
+            <div class="snakes-ladders-board" id="gameBoard"></div></div>
+            <div class="info-panel"><div id="playersStats"></div>
+            <div class="dice-area"><div class="dice" id="diceElement">🎲</div><button class="roll-btn" id="rollDiceBtn">✨ LANZAR DADO ✨</button><div id="feedbackMsg" style="margin-top:12px; background:#00000066; border-radius:40px; padding:8px;">¡Gira el dado y demuestra tu poder verbal!</div></div>
+            <button class="roll-btn" id="resetGameBtn" style="background:#2d3e4b; margin-top:12px;">🔄 NUEVA PARTIDA</button>
+            <button class="roll-btn" id="exitToMenuBtn" style="background:#2e434f;">🏠 MENÚ PRINCIPAL</button></div>
+        </div>
+    </div>
+</div>
+
+<div id="questionModal" class="modal-overlay"><div class="question-card"><h2>📜 VERBO ANCESTRAL</h2><div class="verb-icon" id="verbEmoji" style="font-size:4rem;">🏃</div><p>Selecciona la forma correcta en inglés:</p><div class="options" id="optionsDiv"></div></div></div>
+<div id="papiroFinal" class="papiro-overlay"><div class="papiro-card"><h2>𓋴 VIVORIM: PERGAMINO DE VERDAD 𓋴</h2><div id="papiroStatsContainer" class="papiro-stats"></div><div class="papiro-footer">⚡ Que los verbos te acompañen siempre ⚡<br><button class="close-papiro" id="closePapiroBtn">CERRAR Y VOLVER</button></div></div></div>
+
+<script>
+    // ========== SERPIENTES Y ESCALERAS (ENCADENAMIENTO AUTOMÁTICO) ==========
+    const rawSnakes = { 25: 12, 34: 19, 42: 28, 47: 32, 16: 6, 39: 21, 44: 30, 49: 31 };
+    const rawLadders = { 3: 22, 8: 27, 15: 39, 30: 46, 37: 49, 11: 33, 18: 41, 23: 45 };
+    
+    // Función que aplica el encadenamiento: mientras la casilla actual tenga serpiente o escalera, se sigue moviendo.
+    function applyChainSpecial(pos, visited = new Set()) {
+        if (visited.has(pos)) return pos; // evitar bucles infinitos
+        visited.add(pos);
+        let newPos = pos;
+        if (rawSnakes[newPos]) {
+            newPos = rawSnakes[newPos];
+            return applyChainSpecial(newPos, visited);
+        }
+        if (rawLadders[newPos]) {
+            newPos = rawLadders[newPos];
+            return applyChainSpecial(newPos, visited);
+        }
+        return newPos;
+    }
+    
+    // Diccionarios definitivos con encadenamiento ya resuelto para mostrar mensajes amigables
+    function getFinalPosition(startPos) {
+        return applyChainSpecial(startPos);
+    }
+    
+    const verbsBank = [
+        { emoji: "🏃‍♂️", correct: "run", options: ["run","jump","walk","sprint"] }, { emoji: "🍎", correct: "eat", options: ["eat","drink","chew","bite"] },
+        { emoji: "💤", correct: "sleep", options: ["sleep","rest","dream","nap"] }, { emoji: "📖", correct: "read", options: ["read","study","write","learn"] },
+        { emoji: "🏊", correct: "swim", options: ["swim","dive","float","splash"] }, { emoji: "🎤", correct: "sing", options: ["sing","shout","hum","whistle"] },
+        { emoji: "💃", correct: "dance", options: ["dance","spin","shake","jump"] }, { emoji: "✏️", correct: "write", options: ["write","draw","paint","sketch"] },
+        { emoji: "🚴", correct: "ride", options: ["ride","drive","cycle","pedal"] }, { emoji: "🤔", correct: "think", options: ["think","wonder","imagine","guess"] },
+        { emoji: "😁", correct: "smile", options: ["smile","laugh","grin","beam"] }, { emoji: "👂", correct: "listen", options: ["listen","hear","attend","notice"] },
+        { emoji: "👀", correct: "look", options: ["look","see","watch","stare"] }, { emoji: "🗣️", correct: "speak", options: ["speak","talk","chat","say"] },
+        { emoji: "🤝", correct: "help", options: ["help","assist","support","aid"] }, { emoji: "🍳", correct: "cook", options: ["cook","bake","roast","fry"] },
+        { emoji: "🧗", correct: "climb", options: ["climb","scale","ascend","mount"] }, { emoji: "🎨", correct: "paint", options: ["paint","draw","color","decorate"] },
+        { emoji: "🏹", correct: "shoot", options: ["shoot","throw","launch","fire"] }, { emoji: "✂️", correct: "cut", options: ["cut","slice","chop","trim"] },
+        { emoji: "🔨", correct: "build", options: ["build","construct","create","make"] }, { emoji: "🧹", correct: "clean", options: ["clean","wash","sweep","scrub"] },
+        { emoji: "📞", correct: "call", options: ["call","phone","ring","dial"] }, { emoji: "💪", correct: "lift", options: ["lift","raise","elevate","hoist"] },
+        { emoji: "🧠", correct: "learn", options: ["learn","study","memorize","train"] }
+    ];
+    
+    let numPlayers = 1, playersPos = [], currentPlayer = 0, waitingForAnswer = false, pendingDice = null, gameActive = true;
+    let playerStats = [];
+
+    const selDiv = document.getElementById("selectionContainer"), gameDiv = document.getElementById("gameContainer");
+    const boardDiv = document.getElementById("gameBoard"), statsDiv = document.getElementById("playersStats");
+    const turnSpan = document.getElementById("turnText"), diceEl = document.getElementById("diceElement"), rollBtn = document.getElementById("rollDiceBtn");
+    const feedbackSpan = document.getElementById("feedbackMsg"), resetBtn = document.getElementById("resetGameBtn"), exitBtn = document.getElementById("exitToMenuBtn");
+    const modal = document.getElementById("questionModal"), verbEmojiSpan = document.getElementById("verbEmoji"), optionsDiv = document.getElementById("optionsDiv");
+    const papiroOverlay = document.getElementById("papiroFinal"), papiroContainer = document.getElementById("papiroStatsContainer");
+    
+    document.getElementById("rulesHeader")?.addEventListener("click", () => {
+        document.getElementById("rulesContent").classList.toggle("open");
+        document.getElementById("toggleIcon")?.classList.toggle("rotated");
+    });
+    
+    let activeAlert = null;
+    function showFullscreenAlert(title, message, isSuccess = true) {
+        if (activeAlert) activeAlert.remove();
+        const div = document.createElement("div"); div.className = "fullscreen-alert"; 
+        div.innerHTML = `<div class="alert-card"><h2 style="color:${isSuccess?'#FFE484':'#FFB0A0'}">${title}</h2><p>${message}</p></div>`;
+        document.body.appendChild(div); activeAlert = div;
+        setTimeout(() => { if(div.parentNode) div.remove(); if(activeAlert === div) activeAlert = null; }, 2300);
+    }
+    
+    function showTurnFullscreen(idx) {
+        if(numPlayers>1){
+            showFullscreenAlert("🔄 CAMBIO DE TURNO 🔄", `⚡ JUGADOR ${idx+1} comienza su turno ⚡`, true);
+        }
+    }
+    
+    function showDiceSpinAlert() { const span = document.createElement("div"); span.className = "dice-spin-alert"; span.innerText = "🎡 ¡EL DADO GIRO Y ARROJA UN VERBO! 🎡"; document.body.appendChild(span); setTimeout(() => span.remove(), 800);}
+    
+    function shuffle(arr) { for (let i=arr.length-1;i>0;i--) { const j = Math.floor(Math.random()*(i+1)); [arr[i], arr[j]] = [arr[j], arr[i]]; } return arr; }
+    function randomVerb() { return { ...verbsBank[Math.floor(Math.random()*verbsBank.length)] }; }
+    
+    // Aplica serpiente/escalera con encadenamiento y devuelve la posición final y un mensaje
+    function applySpecialWithMessage(pos) {
+        let current = pos;
+        let steps = [];
+        let visited = new Set();
+        while ((rawSnakes[current] || rawLadders[current]) && !visited.has(current)) {
+            visited.add(current);
+            if (rawSnakes[current]) {
+                steps.push(`🐍 Serpiente: ${current} → ${rawSnakes[current]}`);
+                current = rawSnakes[current];
+            } else if (rawLadders[current]) {
+                steps.push(`🪜 Resorte: ${current} → ${rawLadders[current]}`);
+                current = rawLadders[current];
+            }
+        }
+        if (steps.length > 0) {
+            feedbackSpan.innerText = steps.join(" → luego ");
+            showFullscreenAlert("⚡ EFECTO ENCADENADO ⚡", steps.join(" → luego "), true);
+        }
+        return current;
+    }
+    
+    function registrarVerboJugador(verbCorrect, acerto) {
+        if(!playerStats[currentPlayer]) return;
+        if(acerto) {
+            playerStats[currentPlayer].aciertos++;
+            if(!playerStats[currentPlayer].verbosDominados.includes(verbCorrect)) 
+                playerStats[currentPlayer].verbosDominados.push(verbCorrect);
+        } else {
+            playerStats[currentPlayer].fallos++;
+        }
+    }
+    
+    function moveAfterCorrect(dice, verbCorrecto) {
+        let old = playersPos[currentPlayer];
+        let newPos = old + dice;
+        if (newPos > 50) { 
+            feedbackSpan.innerText = `🎲 Necesitas el número exacto para ganar. Te quedas en ${old}`; 
+            registrarVerboJugador(verbCorrecto, false); 
+            endTurn(false); 
+            return false; 
+        }
+        // posición intermedia antes de aplicar efectos encadenados
+        let intermediate = newPos;
+        let finalPos = applySpecialWithMessage(intermediate);
+        playersPos[currentPlayer] = finalPos;
+        registrarVerboJugador(verbCorrecto, true);
+        let extraMsg = (finalPos !== intermediate) ? ` (efecto especial: de ${intermediate} a ${finalPos})` : "";
+        showFullscreenAlert("🎉 ¡VERBO DOMINADO! 🎉", `✅ "${verbCorrecto}" correcto. Avanzas ${dice} casillas → ${intermediate}${extraMsg}. Posición final: ${finalPos}`, true);
+        if (finalPos === 50) {
+            gameActive = false; rollBtn.disabled = true; updateUI();
+            showFullscreenAlert("👑 ¡GLORIA ETERNA! 👑", `🏆 JUGADOR ${currentPlayer+1} HA ALCANZADO VIVORIM (casilla 50) Y GANA 🏆`, true);
+            mostrarPapiroFinal();
+            return true;
+        }
+        updateUI();
+        endTurn(true);
+        return true;
+    }
+    
+    function endTurn(moved) {
+        waitingForAnswer = false; pendingDice = null;
+        if (gameActive && moved) {
+            currentPlayer = (currentPlayer + 1) % numPlayers;
+            if (numPlayers > 1) showTurnFullscreen(currentPlayer);
+        }
+        if(!gameActive) rollBtn.disabled = true; else rollBtn.disabled = false;
+        updateUI(); modal.classList.remove("active");
+    }
+    
+    function showVerbQuestion(diceVal) {
+        const verb = randomVerb();
+        verbEmojiSpan.innerText = verb.emoji;
+        let opts = shuffle([...verb.options]);
+        optionsDiv.innerHTML = "";
+        opts.forEach(opt => {
+            const btn = document.createElement("button");
+            btn.innerText = opt.toUpperCase();
+            btn.classList.add("opt-btn");
+            btn.onclick = () => {
+                if (!waitingForAnswer) return;
+                if (opt === verb.correct) {
+                    feedbackSpan.innerText = `✨ ¡Exacto! "${opt}" es correcto. ✨`;
+                    moveAfterCorrect(diceVal, verb.correct);
+                } else {
+                    registrarVerboJugador(verb.correct, false);
+                    showFullscreenAlert("❌ FRACASO VERBAL ❌", `❌ Respuesta errónea. El verbo era "${verb.correct}". Pierdes turno.`, false);
+                    feedbackSpan.innerText = `❌ Fallaste. El verbo era "${verb.correct}".`;
+                    modal.classList.remove("active");
+                    waitingForAnswer = false; pendingDice = null; rollBtn.disabled = false;
+                    if (gameActive) {
+                        if (numPlayers > 1) showTurnFullscreen((currentPlayer+1) % numPlayers);
+                        currentPlayer = (currentPlayer + 1) % numPlayers;
+                        updateUI();
+                    }
+                }
+            };
+            optionsDiv.appendChild(btn);
+        });
+        modal.classList.add("active");
+    }
+    
+    async function rollDice() {
+        if (!gameActive) { feedbackSpan.innerText = "Partida culminada. Reinicia."; return; }
+        if (waitingForAnswer) { feedbackSpan.innerText = "Responde el reto verbal actual."; return; }
+        if (playersPos[currentPlayer] === 50) { feedbackSpan.innerText = "Este guerrero ya ganó."; return; }
+        diceEl.classList.add("dice-spinning");
+        showDiceSpinAlert();
+        await new Promise(resolve => setTimeout(resolve, 650));
+        const dice = Math.floor(Math.random()*6)+1;
+        diceEl.innerText = dice;
+        diceEl.classList.remove("dice-spinning");
+        waitingForAnswer = true; pendingDice = dice; rollBtn.disabled = true;
+        showVerbQuestion(dice);
+    }
+    
+    function renderBoard() {
+        boardDiv.innerHTML = "";
+        const occupiedCells = new Set(playersPos);
+        for(let row=0; row<5; row++) {
+            let start = 50 - row*10, end = start-9;
+            for(let col=0; col<10; col++) {
+                let cellNum = (row%2===0) ? start-col : end+col;
+                const cell = document.createElement("div"); cell.className = "cell";
+                if(rawSnakes[cellNum]) cell.classList.add("snake");
+                if(rawLadders[cellNum]) cell.classList.add("ladder");
+                if(cellNum===50) cell.classList.add("crown-cell");
+                if(occupiedCells.has(cellNum)) cell.classList.add("occupied");
+                const numberSpan = document.createElement("div"); numberSpan.className = "cell-number"; numberSpan.innerText = cellNum;
+                cell.appendChild(numberSpan);
+                const cornerIcon = document.createElement("div"); cornerIcon.className = "cell-icon-corner"; cornerIcon.style.position="absolute"; cornerIcon.style.bottom="4px"; cornerIcon.style.right="6px"; cornerIcon.style.fontSize="1rem";
+                if(rawSnakes[cellNum]) cornerIcon.innerText="🐍"; else if(rawLadders[cellNum]) cornerIcon.innerText="🪜✨"; else if(cellNum===50) cornerIcon.innerText="👑"; else cornerIcon.innerText="";
+                cell.appendChild(cornerIcon);
+                const playersDiv = document.createElement("div"); playersDiv.className = "players-on-cell";
+                const colors = ["#FFB347","#6CDB8D","#66C2FF","#FF88B5"];
+                for(let i=0; i<numPlayers; i++) if(playersPos[i]===cellNum) { const token=document.createElement("div"); token.className="token"; token.style.background=colors[i%colors.length]; token.innerText=i+1; playersDiv.appendChild(token); }
+                cell.appendChild(playersDiv);
+                boardDiv.appendChild(cell);
+            }
+        }
+    }
+    
+    function updateUI() {
+        renderBoard(); statsDiv.innerHTML = "";
+        const colors = ["#FFB347","#6CDB8D","#66C2FF","#FF88B5"];
+        for(let i=0;i<numPlayers;i++) {
+            const stat = document.createElement("div"); stat.className = `player-stat`; stat.style.background="#1b2638"; stat.style.borderRadius="60px"; stat.style.padding="12px 20px"; stat.style.marginBottom="10px";
+            if(currentPlayer === i && gameActive) stat.style.background = "#E68342";
+            stat.innerHTML = `<div style="display:flex; gap:12px;"><div style="background:${colors[i%colors.length]}; width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center;">${i+1}</div> Jugador ${i+1}</div><div>🏁 ${playersPos[i]} &nbsp; ✅${playerStats[i]?.aciertos||0} ❌${playerStats[i]?.fallos||0}</div>`;
+            statsDiv.appendChild(stat);
+        }
+        turnSpan.innerText = gameActive ? `🎲 TURNO: JUGADOR ${currentPlayer+1}` : "🏆 JUEGO FINALIZADO 🏆";
+        if(playersPos.some(p=>p===50)) gameActive=false;
+    }
+    
+    function mostrarPapiroFinal() {
+        papiroContainer.innerHTML = "";
+        for(let i=0;i<numPlayers;i++) {
+            const stats = playerStats[i];
+            const dominados = stats.verbosDominados.length > 0 ? stats.verbosDominados.join(", ") : "ninguno";
+            const div = document.createElement("div"); div.className = "jugador-resumen";
+            div.innerHTML = `<strong>⚔️ JUGADOR ${i+1} ⚔️</strong><br>📜 ACIERTOS: <span class="aciertos">${stats.aciertos}</span><br>💔 FALLOS: <span class="fallos">${stats.fallos}</span><br>🏆 VERBOS DOMINADOS: <span style="color:#a76d2f;">${dominados}</span><br>✨ CASILLA FINAL: ${playersPos[i]} ✨`;
+            papiroContainer.appendChild(div);
+        }
+        papiroOverlay.classList.add("active");
+    }
+    
+    function initGame(players) {
+        numPlayers = players; playersPos = new Array(numPlayers).fill(1); currentPlayer = 0; gameActive = true; waitingForAnswer=false; rollBtn.disabled=false;
+        playerStats = [];
+        for(let i=0;i<numPlayers;i++) playerStats.push({ aciertos:0, fallos:0, verbosDominados: [] });
+        feedbackSpan.innerText = "🎲 ¡VIVORIM te llama! Lanza el dado y muestra tu verbo.";
+        if(activeAlert) activeAlert.remove();
+        updateUI(); modal.classList.remove("active"); if(papiroOverlay.classList.contains("active")) papiroOverlay.classList.remove("active");
+    }
+    
+    function resetGame() { initGame(numPlayers); }
+    function exitMenu() { gameDiv.style.display = "none"; selDiv.style.display = "block"; modal.classList.remove("active"); waitingForAnswer=false; if(papiroOverlay.classList.contains("active")) papiroOverlay.classList.remove("active"); if(activeAlert) activeAlert.remove();}
+    
+    document.querySelectorAll(".player-btn").forEach(btn=>btn.addEventListener("click",(e)=>{ const p = parseInt(e.target.getAttribute("data-players")); selDiv.style.display="none"; gameDiv.style.display="block"; initGame(p); }));
+    rollBtn.addEventListener("click", rollDice); resetBtn.addEventListener("click", resetGame); exitBtn.addEventListener("click", exitMenu);
+    document.getElementById("closePapiroBtn")?.addEventListener("click",()=>{ papiroOverlay.classList.remove("active"); exitMenu(); });
+</script>
+</body>
+</html>
